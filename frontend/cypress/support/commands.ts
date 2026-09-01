@@ -65,6 +65,26 @@ Cypress.Commands.add('deleteGameByTitle', (title: string) => {
   });
 });
 
+// Suche über die UI: tippen, Button klicken, auf Request warten.
+Cypress.Commands.add('searchFor', (term: string) => {
+  cy.intercept('GET', '/api/games/search*').as('searchRequest');
+  cy.get('.search-bar__input').clear();
+  if (term) cy.get('.search-bar__input').type(term, { delay: 0 });
+  cy.get('.search-bar__button').click();
+  cy.wait('@searchRequest');
+});
+
+// Leere Ergebnisliste herbeiführen: nach nicht existierendem Begriff suchen.
+Cypress.Commands.add('produceEmptyResultList', () => {
+  cy.searchFor(`KeinSpielMitDiesemNamen__${Date.now()}`);
+  cy.get('.game-list__status-title').should('contain.text', 'No Games Found');
+});
+
+// Spiel direkt über die API anlegen.
+Cypress.Commands.add('createGameViaApi', (game) => {
+  return cy.request('POST', '/api/games', game).then((res) => res.body);
+});
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -78,6 +98,20 @@ declare global {
         releaseDate?: string;
       }): Chainable<void>;
       deleteGameByTitle(title: string): Chainable<void>;
+      searchFor(term: string): Chainable<void>;
+      produceEmptyResultList(): Chainable<void>;
+      createGameViaApi(game: {
+        title: string;
+        description?: string;
+        imageUrl?: string;
+        releaseDate: string;
+      }): Chainable<{
+        id: number;
+        title: string;
+        description?: string;
+        imageUrl?: string;
+        releaseDate: string;
+      }>;
     }
   }
 }
