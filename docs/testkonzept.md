@@ -39,7 +39,7 @@ Abzudeckende Funktionen:
 | Stufe | Werkzeug | Was | Stand |
 |---|---|---|---|
 | Unit | JUnit 5, Mockito | `GameService` mit gemocktem `GameRepository`; `TitleNormalizer` | vorhanden |
-| Integration | `@SpringBootTest`, H2 | Service mit echter Datenbank | ab 5.3 |
+| Integration | `@SpringBootTest`, MockMvc, H2 | `GameApiIntegrationTest`: Spielliste, Suche, unbekannte ID (Controller bis Datenbank) | vorhanden |
 | Schnittstelle | `@WebMvcTest`/MockMvc, Postman | REST-Endpunkte, Statuscodes | ab 6.1/6.2 |
 | System/E2E | Cypress | UI-Abläufe im Browser | vorhanden (lokal, nicht im CI) |
 
@@ -48,4 +48,5 @@ Abzudeckende Funktionen:
 - **TDD**: Neues Verhalten entsteht in Zyklen rot – grün – refactor. Pro Zyklus ein Commit `rot: …` (nur der Test, Lauf rot) und ein Commit `grün: …` (Umsetzung, alle Tests grün). Beispiel: `TitleNormalizer` auf dem Branch `feature/title-normalizer`.
 - **Branches und Pull Requests**: Arbeit auf einem Feature-Branch, Merge nach `main` über einen Pull Request.
 - **Pipeline** (`.github/workflows/ci.yml`): Bei jedem Push und Pull Request führt GitHub Actions `./mvnw -B test` für jeden Maven-Ordner der Matrix aus (aktuell `backend`, JDK 26).
+- **Abdeckung**: Die Pipeline führt `./mvnw -B verify` aus; JaCoCo schreibt den Bericht nach `target/site/jacoco`, er wird als Artefakt `jacoco-backend` hochgeladen.
 - **Deploy nur bei grünen Tests**: Der Job `deploy` hat `needs: test` und startet nur, wenn alle Test-Jobs grün sind. Vorerst ist er ein Platzhalter (`echo "deploy"`).
